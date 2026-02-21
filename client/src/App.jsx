@@ -5,6 +5,7 @@ import Register from "./pages/Register.jsx";
 import Feed from "./pages/Feed.jsx";
 import Profile from "./pages/Profile.jsx";
 import VideoCall from "./pages/VideoCall.jsx";
+import Chat from "./pages/Chat.jsx";
 import Navbar from "./components/Navbar.jsx";
 
 function PrivateRoute({ children }) {
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/" element={<PrivateRoute><Feed /></PrivateRoute>} />
+        <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
         <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
         <Route path="/call/:postId" element={<PrivateRoute><VideoCall /></PrivateRoute>} />
         <Route path="*" element={<Navigate to="/" />} />

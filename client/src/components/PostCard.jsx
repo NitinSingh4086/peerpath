@@ -54,6 +54,15 @@ export default function PostCard({ post, onDelete, onUpdate }) {
         await api.volunteer(post.id);
         setHasVolunteered(true);
         setVolunteerCount(c => c + 1);
+        // Auto-create a direct chat between volunteer and post author
+        try {
+          const { id: convId } = await api.createConversation({
+            post_id: post.id,
+            member_ids: [post.user_id],
+            is_group: false
+          });
+          navigate(`/chat?conv=${convId}`);
+        } catch {}
       }
     } catch (err) {
       alert(err.message);

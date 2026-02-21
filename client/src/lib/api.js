@@ -43,5 +43,16 @@ export const api = {
 
   // Profile
   getProfile: () => request("GET", "/profile"),
-  updateProfile: (body) => request("PUT", "/profile", body)
+  updateProfile: (body) => request("PUT", "/profile", body),
+
+  // Users search
+  searchUsers: (q) => request("GET", `/users?q=${encodeURIComponent(q)}`),
+
+  // Conversations
+  getConversations: () => request("GET", "/conversations"),
+  createConversation: (body) => request("POST", "/conversations", body),
+
+  // Messages
+  getMessages: (convId) => request("GET", `/conversations/${convId}/messages`),
+  sendMessage: (convId, body) => request("POST", `/conversations/${convId}/messages`, { body }),
 };

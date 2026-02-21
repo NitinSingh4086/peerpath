@@ -10,7 +10,7 @@ export function getSupabase() {
 
 export function getGemini() {
   const genai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  return genai.getGenerativeModel({ model: "gemini-2.0-flash" });
+  return genai.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 }
 
 export async function requireAuth(req, res) {

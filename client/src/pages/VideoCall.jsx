@@ -1,12 +1,29 @@
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { api } from "../lib/api.js";
 
 export default function VideoCall() {
   const { postId } = useParams();
   const navigate = useNavigate();
+  const iframeRef = useRef(null);
+  const [callUrl, setCallUrl] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // Jitsi room name based on post ID — unique per post
-  const roomName = `peerpath-ualberta-${postId}`;
-  const jitsiUrl = `https://meet.jit.si/${roomName}`;
+  useEffect(() => {
+    async function setup() {
+      try {
+        const { room_url, token } = await api.createCall(postId);
+        // Append token to URL for Daily.co iframe embed
+        const url = `${room_url}?t=${token}`;
+        setCallUrl(url);
+      } catch (err) {
+        setError(err.message);
+      }
+      setLoading(false);
+    }
+    setup();
+  }, [postId]);
 
   return (
     <div style={{ background: "#0D1117", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
@@ -25,13 +42,33 @@ export default function VideoCall() {
         </button>
       </div>
 
-      {/* Jitsi iframe */}
-      <iframe
-        src={jitsiUrl}
-        allow="camera; microphone; fullscreen; speaker; display-capture"
-        style={{ width: "100%", height: "calc(100vh - 57px)", border: "none" }}
-        title="PeerPath Video Call"
-      />
+      {/* Call area */}
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        {loading ? (
+          <div style={{ textAlign: "center", color: "white" }}>
+            <div style={{ fontSize: 40, marginBottom: 16 }}>📹</div>
+            <p style={{ fontSize: 16, color: "#aaa" }}>Setting up your call...</p>
+          </div>
+        ) : error ? (
+          <div style={{ textAlign: "center", color: "white", maxWidth: 400 }}>
+            <div style={{ fontSize: 40, marginBottom: 16 }}>⚠️</div>
+            <p style={{ fontSize: 15, color: "#E63946", marginBottom: 8 }}>Could not start call</p>
+            <p style={{ fontSize: 13, color: "#888", marginBottom: 20 }}>{error}</p>
+            <p style={{ fontSize: 12, color: "#666" }}>Make sure your DAILY_API_KEY is set in server/.env and you have a Daily.co account at daily.co</p>
+            <button onClick={() => navigate("/")} style={{ marginTop: 16, background: "#004D1C", color: "white", padding: "10px 24px", borderRadius: 10, fontSize: 14, border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+              Back to Feed
+            </button>
+          </div>
+        ) : (
+          <iframe
+            ref={iframeRef}
+            src={callUrl}
+            allow="camera; microphone; fullscreen; speaker; display-capture"
+            style={{ width: "100%", height: "calc(100vh - 57px)", border: "none" }}
+            title="PeerPath Video Call"
+          />
+        )}
+      </div>
     </div>
   );
 }

@@ -24,11 +24,6 @@ async function request(method, path, body) {
 }
 
 export const api = {
-  get: (path) => request("GET", path),
-  post: (path, body) => request("POST", path, body),
-  put: (path, body) => request("PUT", path, body),
-  delete: (path) => request("DELETE", path),
-
   // Posts
   getPosts: () => request("GET", "/posts"),
   createPost: (body) => request("POST", "/posts", body),
@@ -37,7 +32,7 @@ export const api = {
   // Volunteers
   volunteer: (postId) => request("POST", `/posts/${postId}/volunteer`),
   unvolunteer: (postId) => request("DELETE", `/posts/${postId}/volunteer`),
-  getVolunteers: (postId) => request("GET", `/posts/${postId}/volunteers`),
+  getVolunteers: (postId) => request("GET", `/posts/${postId}/volunteer`),
 
   // AI
   getAIResources: (body) => request("POST", "/ai/resources", body),
@@ -45,9 +40,6 @@ export const api = {
 
   // YouTube
   searchYouTube: (q) => request("GET", `/youtube?q=${encodeURIComponent(q)}`),
-
-  // Video calls
-  createCall: (postId) => request("POST", "/calls/create", { post_id: postId }),
 
   // Profile
   getProfile: () => request("GET", "/profile"),

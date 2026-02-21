@@ -8,13 +8,15 @@ export default async function handler(req, res) {
   if (!user) return;
 
   const supabase = getSupabase();
-  const { id } = req.query;
+  const { conv_id } = req.query;
+
+  if (!conv_id) return res.status(400).json({ error: "conv_id required" });
 
   // Verify user is a member
   const { data: member } = await supabase
     .from("conversation_members")
     .select("id")
-    .eq("conversation_id", id)
+    .eq("conversation_id", conv_id)
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -25,7 +27,7 @@ export default async function handler(req, res) {
     const { data, error } = await supabase
       .from("messages")
       .select("*, profiles (id, full_name)")
-      .eq("conversation_id", id)
+      .eq("conversation_id", conv_id)
       .order("created_at", { ascending: true });
 
     if (error) return res.status(500).json({ error: error.message });
@@ -39,7 +41,7 @@ export default async function handler(req, res) {
 
     const { data, error } = await supabase
       .from("messages")
-      .insert({ conversation_id: id, sender_id: user.id, body: body.trim() })
+      .insert({ conversation_id: conv_id, sender_id: user.id, body: body.trim() })
       .select("*, profiles (id, full_name)")
       .single();
 

@@ -53,6 +53,6 @@ export const api = {
   createConversation: (body) => request("POST", "/conversations", body),
 
   // Messages
-  getMessages: (convId) => request("GET", `/conversations/${convId}/messages`),
-  sendMessage: (convId, body) => request("POST", `/conversations/${convId}/messages`, { body }),
+  getMessages: (convId) => request("GET", `/messages/index?conv_id=${convId}`),
+  sendMessage: (convId, body) => request("POST", `/messages/index?conv_id=${convId}`, { body }),
 };

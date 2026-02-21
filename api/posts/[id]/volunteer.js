@@ -1,4 +1,4 @@
-const { getSupabase, requireAuth, setCors } = require("../../_helpers");
+import { getSupabase, requireAuth, setCors } from "../../_helpers.js";
 
 export default async function handler(req, res) {
   setCors(res);
@@ -7,14 +7,14 @@ export default async function handler(req, res) {
   const supabase = getSupabase();
   const { id } = req.query;
 
-  // GET - list volunteers for a post
+  // GET - list volunteers
   if (req.method === "GET") {
     const { data, error } = await supabase
       .from("volunteers")
       .select("*, profiles (id, full_name, avatar_url, year_of_study)")
       .eq("post_id", id);
     if (error) return res.status(500).json({ error: error.message });
-    return res.json(data);
+    return res.json(data || []);
   }
 
   const user = await requireAuth(req, res);
@@ -27,7 +27,7 @@ export default async function handler(req, res) {
       .select("id")
       .eq("post_id", id)
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (existing) return res.status(409).json({ error: "Already volunteered" });
 

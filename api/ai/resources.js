@@ -1,4 +1,4 @@
-const { getGemini, requireAuth, setCors } = require("../_helpers");
+import { getGemini, requireAuth, setCors } from "../_helpers.js";
 
 export default async function handler(req, res) {
   setCors(res);
@@ -12,24 +12,17 @@ export default async function handler(req, res) {
   try {
     const gemini = getGemini();
     const result = await gemini.generateContent(
-      `You are an academic tutor assistant helping university students find learning resources. Always be specific, practical, and encouraging.
+      `You are an academic tutor assistant helping university students find learning resources. Be specific and practical.
 
 A University of Alberta student needs help with:
 Course: ${course_code}
 Topic: ${topic}
 Their question: "${body}"
 
-Suggest 5 highly specific learning resources. For each resource:
-- Give the exact resource name (book chapter, website, video title)
-- Explain in 1 sentence WHY it helps for this specific question
-- Rate difficulty: Beginner / Intermediate / Advanced
-
-Format each as:
-RESOURCE: [name]
-WHY: [reason]
-LEVEL: [difficulty]
-
-Be specific. No generic suggestions like "Khan Academy" without naming the exact video/topic.`
+Suggest 5 highly specific learning resources. For each:
+RESOURCE: [exact name]
+WHY: [1 sentence why it helps]
+LEVEL: Beginner / Intermediate / Advanced`
     );
     res.json({ content: result.response.text() });
   } catch (err) {

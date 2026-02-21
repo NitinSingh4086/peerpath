@@ -1,5 +1,4 @@
-const axios = require("axios");
-const { requireAuth, setCors } = require("./_helpers");
+import { requireAuth, setCors } from "./_helpers.js";
 
 export default async function handler(req, res) {
   setCors(res);
@@ -13,18 +12,21 @@ export default async function handler(req, res) {
   if (!q) return res.status(400).json({ error: "query required" });
 
   try {
-    const response = await axios.get("https://www.googleapis.com/youtube/v3/search", {
-      params: {
-        part: "snippet",
-        q: `${q} tutorial explained`,
-        type: "video",
-        maxResults: 5,
-        relevanceLanguage: "en",
-        safeSearch: "strict",
-        key: process.env.YOUTUBE_API_KEY
-      }
-    });
-    const videos = response.data.items.map(item => ({
+    const url = new URL("https://www.googleapis.com/youtube/v3/search");
+    url.searchParams.set("part", "snippet");
+    url.searchParams.set("q", `${q} tutorial explained`);
+    url.searchParams.set("type", "video");
+    url.searchParams.set("maxResults", "5");
+    url.searchParams.set("relevanceLanguage", "en");
+    url.searchParams.set("safeSearch", "strict");
+    url.searchParams.set("key", process.env.YOUTUBE_API_KEY);
+
+    const response = await fetch(url.toString());
+    const data = await response.json();
+
+    if (!response.ok) return res.status(500).json({ error: data.error?.message || "YouTube API error" });
+
+    const videos = data.items.map(item => ({
       videoId: item.id.videoId,
       title: item.snippet.title,
       channel: item.snippet.channelTitle,
@@ -33,6 +35,6 @@ export default async function handler(req, res) {
     }));
     res.json(videos);
   } catch (err) {
-    res.status(500).json({ error: err.response?.data?.error?.message || err.message });
+    res.status(500).json({ error: err.message });
   }
 }
